@@ -5,7 +5,7 @@ namespace Catedra3Backend.Src.Models{
         public required string Title { get; set; }
         public required DateTime PublishedDate { get; set; }
         public required string ImageUrl { get; set; }
-        public required int UserId { get; set; }
+        public required string UserId { get; set; }
         public required User User { get; set; }
 
     }
