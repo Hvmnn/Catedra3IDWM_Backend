@@ -8,7 +8,7 @@ namespace Catedra3Backend.Src.DTOs
         public required string Title { get; set; }
 
         [RegularExpression(@"\.(jpg|png)$", ErrorMessage = "Solo se permiten archivos JPG y PNG.")]
-        public required IFormFile? ImageUrl { get; set; }
+        public required IFormFile? Image { get; set; }
 
         public required string UserId { get; set; }
     }

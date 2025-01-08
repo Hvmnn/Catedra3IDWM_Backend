@@ -2,6 +2,10 @@ using System.Text;
 using Catedra3Backend.Src.Data;
 using Catedra3Backend.Src.Helpers;
 using Catedra3Backend.Src.Models;
+using Catedra3Backend.Src.Repositories.Implements;
+using Catedra3Backend.Src.Repositories.Interfaces;
+using Catedra3Backend.Src.Services.Implements;
+using Catedra3Backend.Src.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -20,6 +24,11 @@ builder.Services.AddDbContext<DataContext>(options => options.UseSqlite("Data So
 builder.Services.AddIdentity<User, IdentityRole>()
     .AddEntityFrameworkStores<DataContext>()
     .AddDefaultTokenProviders();
+
+builder.Services.AddScoped<IPostRepository, PostRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();    
 
 builder.Services.Configure<IdentityOptions>(options =>
 {
@@ -46,7 +55,23 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowLocalhost",
+        builder => builder
+            .AllowAnyOrigin()
+            .AllowAnyMethod()
+            .AllowAnyHeader());
+});
+
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope()){
+    var services = scope.ServiceProvider;
+    var dbContext = services.GetRequiredService<DataContext>();
+
+    dbContext.Database.Migrate();
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -58,7 +83,7 @@ if (app.Environment.IsDevelopment())
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
-
+app.UseCors("AllowLocalhost");
 app.UseHttpsRedirection();
 
 app.Run();

@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using Catedra3Backend.Src.DTOs;
 using Catedra3Backend.Src.Models;
 using Catedra3Backend.Src.Repositories.Interfaces;
@@ -14,12 +15,14 @@ namespace Catedra3Backend.Src.Controllers
         private readonly IUserRepository _userRepository;
         private readonly ITokenService _tokenService;
         private readonly UserManager<User> _userManager;
+        private readonly SignInManager<User> _signInManager;
 
-        public AuthController(IUserRepository userRepository, ITokenService tokenService, UserManager<User> userManager)
+        public AuthController(IUserRepository userRepository, ITokenService tokenService, UserManager<User> userManager, SignInManager<User> signInManager)
         {
             _userRepository = userRepository;
             _tokenService = tokenService;
             _userManager = userManager;
+            _signInManager = signInManager;
         }
 
         [HttpPost("register")]
@@ -51,10 +54,15 @@ namespace Catedra3Backend.Src.Controllers
         public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
         {
             var user = await _userRepository.GetUserByEmailAsync(loginDto.Email);
-
-            if (user == null || user.PasswordHash != loginDto.Password)
+            if (user == null)
             {
-                return BadRequest("Credenciales inválidas");
+                return Unauthorized("Credenciales inválidas");
+            }
+
+            var result = await _signInManager.CheckPasswordSignInAsync(user, loginDto.Password, false);
+            if (!result.Succeeded)
+            {
+                return Unauthorized("Credenciales inválidas");
             }
 
             var token = _tokenService.GenerateJwtToken(user);

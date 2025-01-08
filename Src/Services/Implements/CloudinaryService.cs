@@ -11,9 +11,9 @@ namespace Catedra3Backend.Src.Services.Implements
         public CloudinaryService(IConfiguration configuration)
         {
             var account = new Account(
-                configuration["Cloudinary:CloudName"],
-                configuration["Cloudinary:ApiKey"],
-                configuration["Cloudinary:ApiSecret"]
+                configuration["Cloudinary:dx71lh0ez"],
+                configuration["Cloudinary:558632156686473"],
+                configuration["Cloudinary:9RCHUlMrmzmOfrosZWW2bV8wivo"]
             );
             _cloudinary = new Cloudinary(account);
         }
@@ -22,7 +22,7 @@ namespace Catedra3Backend.Src.Services.Implements
         {
             if (file.Length > 5 * 1024 * 1024)
             {
-                throw new ArgumentException("El tamaño del archivo excede los 5 mb.");
+                throw new ArgumentException("El tamaño del archivo excede los 5 MB.");
             }
 
             var uploadParams = new ImageUploadParams
