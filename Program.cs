@@ -1,5 +1,6 @@
 using System.Text;
 using Catedra3Backend.Src.Data;
+using Catedra3Backend.Src.Helpers;
 using Catedra3Backend.Src.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -14,6 +15,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddAutoMapper(typeof(MappingProfile));
 builder.Services.AddDbContext<DataContext>(options => options.UseSqlite("Data Source = Catedra3IDWM.db"));
 builder.Services.AddIdentity<User, IdentityRole>()
     .AddEntityFrameworkStores<DataContext>()
