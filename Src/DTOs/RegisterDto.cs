@@ -5,6 +5,7 @@ namespace Catedra3Backend.Src.DTOs
     public class RegisterDto
     {
         [Required(ErrorMessage = "El email es obligatorio.")]
+        [EmailAddress(ErrorMessage = "El email no es válido.")]
         public string Email { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "La Contraseña es obligatoria.")]
