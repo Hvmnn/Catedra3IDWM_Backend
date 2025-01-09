@@ -31,7 +31,7 @@ namespace Catedra3Backend.Src.Controllers
             var existingUser = await _userRepository.GetUserByEmailAsync(registerDto.Email);
             if (existingUser != null)
             {
-                return BadRequest("Email ya registrado");
+                return BadRequest(new {message = "Email ya registrado"});
             }
 
             var user = new User
@@ -44,10 +44,10 @@ namespace Catedra3Backend.Src.Controllers
 
             if (!result.Succeeded)
             {
-                return BadRequest(result.Errors.Select(e => e.Description));
+                return BadRequest(new { message = "Error al registrar el usuario." });
             }
 
-            return Ok("Usuario registrado exitosamente");
+            return Ok(new { message = "Usuario registrado exitosamente" });
         }
 
         [HttpPost("login")]
