@@ -11,9 +11,9 @@ namespace Catedra3Backend.Src.Services.Implements
         public CloudinaryService(IConfiguration configuration)
         {
             var account = new Account(
-                configuration["Cloudinary:dx71lh0ez"],
-                configuration["Cloudinary:558632156686473"],
-                configuration["Cloudinary:9RCHUlMrmzmOfrosZWW2bV8wivo"]
+                configuration["Cloudinary:CloudName"],
+                configuration["Cloudinary:ApiKey"],
+                configuration["Cloudinary:ApiSecret"]
             );
             _cloudinary = new Cloudinary(account);
         }
@@ -25,6 +25,14 @@ namespace Catedra3Backend.Src.Services.Implements
                 throw new ArgumentException("El tamaño del archivo excede los 5 MB.");
             }
 
+            var allowedExtensions = new[] { ".jpg", ".png" };
+            var fileExtension = Path.GetExtension(file.FileName).ToLower();
+
+            if (!allowedExtensions.Contains(fileExtension))
+            {
+                throw new ArgumentException("Formato de archivo no permitido. Solo se permiten .jpg y .png.");
+            }
+            
             var uploadParams = new ImageUploadParams
             {
                 File = new FileDescription(file.FileName, file.OpenReadStream()),
