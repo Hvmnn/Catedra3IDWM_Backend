@@ -16,7 +16,6 @@ using Microsoft.OpenApi.Models;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
@@ -99,14 +98,20 @@ builder
 
         options.Events = new JwtBearerEvents
         {
+            OnMessageReceived = context =>
+            {
+                var token = context.Request.Headers["Authorization"].FirstOrDefault();
+                Console.WriteLine("Token recibido por el backend: " + token);
+                return Task.CompletedTask;
+            },
             OnChallenge = async context =>
             {
                 context.HandleResponse();
                 context.Response.StatusCode = 401;
                 context.Response.ContentType = "application/json";
-                await context.Response.WriteAsync(
-                    JsonSerializer.Serialize(new { message = "No autorizado" })
-                );
+
+                var result = JsonSerializer.Serialize(new { message = "El token ha expirado o no es válido." });
+                await context.Response.WriteAsync(result);
             }
         };
     });
@@ -115,7 +120,11 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy(
         "AllowLocalhost",
-        builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()
+        builder => builder
+            .WithOrigins("http://localhost:4200")
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials()
     );
 });
 
@@ -136,11 +145,12 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+
+app.UseCors("AllowLocalhost");
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
-app.UseCors("AllowLocalhost");
 app.UseHttpsRedirection();
 
 app.Run();

@@ -57,7 +57,7 @@ namespace Catedra3Backend.Src.Controllers
             post.ImageUrl = imageUrl;
 
             await _postRepository.CreatePostAsync(post);
-            return Ok("Post creado exitosamente");
+            return Ok(new { message = "Post creado exitosamente"});
         }
 
 
